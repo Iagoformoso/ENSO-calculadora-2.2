@@ -117,6 +117,49 @@ public class Controller implements EventHandler {
         resetingInput = false;
     }
 
+    @Override
+    public void onReturnPressed() {
+
+        if (displayBuffer.length() > 0) {
+
+            String s = displayBuffer.toString();
+
+            //If it ends in .0, then remove it
+            if (s.endsWith(".0")) {
+                displayBuffer.setLength(displayBuffer.length() - 2);
+            }
+
+            //In case the number was only .0, we check if there is anything left to delete
+            if(displayBuffer.length()>0) {
+                displayBuffer.deleteCharAt(displayBuffer.length() - 1);
+            }
+
+            //If there is nothing left, clear display
+            if (displayBuffer.length() == 0) {
+                view.clearDisplay();
+            } else {
+                try {
+                    String currentS = displayBuffer.toString();
+
+                    //If theres only a "-" left its removed
+                    if (currentS.equals("-")) {
+                        displayBuffer.setLength(0);
+                        view.clearDisplay();
+                    //If theres a valid number display it
+                    } else {
+                        Double result=Double.parseDouble(currentS);
+                        view.setDisplay(formatResult(result));
+                    }
+                //Format exception clears display
+                } catch (NumberFormatException e) {
+                    displayBuffer.setLength(0);
+                    view.clearDisplay();
+                }
+            }
+
+        }
+    }
+    
     private String formatResult(Double result) {
         if (Double.isNaN(result)) {
             return "NaN";
