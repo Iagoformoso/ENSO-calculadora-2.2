@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -26,8 +27,23 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-import static calculator.domain.BinaryOperatorModes.*;
-import static calculator.domain.UnaryOperatorModes.*;
+import static calculator.domain.BinaryOperatorModes.ADD;
+import static calculator.domain.BinaryOperatorModes.DIVIDE;
+import static calculator.domain.BinaryOperatorModes.MINUS;
+import static calculator.domain.BinaryOperatorModes.MULTIPLY;
+import static calculator.domain.BinaryOperatorModes.POWER;
+import static calculator.domain.UnaryOperatorModes.ABS;
+import static calculator.domain.UnaryOperatorModes.BIN;
+import static calculator.domain.UnaryOperatorModes.COS;
+import static calculator.domain.UnaryOperatorModes.INV;
+import static calculator.domain.UnaryOperatorModes.LN;
+import static calculator.domain.UnaryOperatorModes.LOG;
+import static calculator.domain.UnaryOperatorModes.NEGATE;
+import static calculator.domain.UnaryOperatorModes.PERCENT;
+import static calculator.domain.UnaryOperatorModes.SIN;
+import static calculator.domain.UnaryOperatorModes.SQRT;
+import static calculator.domain.UnaryOperatorModes.SQUARE;
+import static calculator.domain.UnaryOperatorModes.TAN;
 
 public class SwingView implements View {
 
@@ -38,9 +54,9 @@ public class SwingView implements View {
 
     private final JButton[] butNums;
     private final JButton butAdd, butMinus, butMultiply, butDivide,
-            butEqual, butCancel, butSqrt, butSquare, butInv, butCos, 
-            butSin, butTan, butPower, butLog, butPercent, butAbs, butBin, 
-            butln, butNegate, butDecimal;
+            butEqual, butCancel, butSqrt, butSquare, butInv, butCos,
+            butSin, butTan, butPower, butLog, butPercent, butAbs, butBin,
+            butln, butNegate, butDecimal, butPi, butE;
 
     private EventHandler eventHandler;
 
@@ -52,7 +68,9 @@ public class SwingView implements View {
     private final DecimalFormat decimalFormat;
     private boolean startNewInput = true;
 
-    public enum ButtonType { NUMBER, FUNCTION }
+    public enum ButtonType {
+        NUMBER, FUNCTION
+    }
 
     public SwingView() throws IOException {
         Locale.setDefault(Locale.US);
@@ -79,9 +97,9 @@ public class SwingView implements View {
         text.setHorizontalAlignment(JTextField.RIGHT);
         text.setColumns(15);
         text.setBackground(Color.WHITE);
-        text.setOpaque(true); 
+        text.setOpaque(true);
         text.setBorder(javax.swing.BorderFactory.createLineBorder(
-            UIManager.getColor("Panel.background"), 5));
+                UIManager.getColor("Panel.background"), 5));
 
         // Number buttons
         butNums = new JButton[10];
@@ -110,7 +128,8 @@ public class SwingView implements View {
         butBin = createButton("bin", ButtonType.FUNCTION);
         butNegate = createButton("+/-", ButtonType.NUMBER);
         butDecimal = createButton(".", ButtonType.NUMBER);
-
+        butPi = createButton("π", ButtonType.NUMBER);
+        butE = createButton("e", ButtonType.NUMBER);
         setupLayout();
     }
 
@@ -162,6 +181,8 @@ public class SwingView implements View {
         subPanels[4].add(butNegate);
         subPanels[4].add(butNums[0]);
         subPanels[4].add(butDecimal);
+        subPanels[4].add(butPi);
+        subPanels[4].add(butE);
         mainPanel.add(subPanels[4]);
 
         // --- Extra separation ---
@@ -197,7 +218,8 @@ public class SwingView implements View {
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        if (image != null) frame.setIconImage(image.getImage());
+        if (image != null)
+            frame.setIconImage(image.getImage());
         frame.add(mainPanel);
         frame.setVisible(true);
     }
@@ -235,6 +257,22 @@ public class SwingView implements View {
         butDecimal.addActionListener(e -> eventHandler.onDecimalPressed());
         butEqual.addActionListener(e -> eventHandler.onEqualsPressed());
         butCancel.addActionListener(e -> eventHandler.onClearPressed());
+
+        // Constants
+        butPi.addActionListener(e -> {
+            if (startNewInput) {
+                setDisplay(String.valueOf(Math.PI));
+            } else {
+                appendToDisplay(String.valueOf(Math.PI));
+            }
+        });
+        butE.addActionListener(e -> {
+            if (startNewInput) {
+                setDisplay(String.valueOf(Math.E));
+            } else {
+                appendToDisplay(String.valueOf(Math.E));
+            }
+        });
     }
 
     @Override
@@ -302,7 +340,8 @@ public class SwingView implements View {
 
     private ImageIcon loadIcon() throws IOException {
         try (InputStream is = getClass().getResourceAsStream("/icon/icon.png")) {
-            if (is == null) return null;
+            if (is == null)
+                return null;
             BufferedImage bufferedImage = ImageIO.read(is);
             return new ImageIcon(bufferedImage);
         } catch (Exception e) {
