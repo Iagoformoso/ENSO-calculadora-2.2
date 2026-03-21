@@ -259,20 +259,8 @@ public class SwingView implements View {
         butCancel.addActionListener(e -> eventHandler.onClearPressed());
 
         // Constants
-        butPi.addActionListener(e -> {
-            if (startNewInput) {
-                setDisplay(String.valueOf(Math.PI));
-            } else {
-                appendToDisplay(String.valueOf(Math.PI));
-            }
-        });
-        butE.addActionListener(e -> {
-            if (startNewInput) {
-                setDisplay(String.valueOf(Math.E));
-            } else {
-                appendToDisplay(String.valueOf(Math.E));
-            }
-        });
+        butPi.addActionListener(e -> eventHandler.onConstantPressed(Math.PI));
+        butE.addActionListener(e -> eventHandler.onConstantPressed(Math.E));
     }
 
     @Override
