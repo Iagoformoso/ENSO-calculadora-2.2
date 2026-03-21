@@ -40,7 +40,7 @@ public class SwingView implements View {
     private final JButton butAdd, butMinus, butMultiply, butDivide,
             butEqual, butCancel, butSqrt, butSquare, butInv, butCos, 
             butSin, butTan, butPower, butLog, butPercent, butAbs, butBin, 
-            butln, butNegate, butDecimal;
+            butln, butNegate, butDecimal, butReturn;
 
     private EventHandler eventHandler;
 
@@ -96,6 +96,7 @@ public class SwingView implements View {
         butDivide = createButton("/", ButtonType.FUNCTION);
         butEqual = createButton("=", ButtonType.FUNCTION);
         butCancel = createButton("C", ButtonType.FUNCTION);
+        butReturn = createButton("DEL", ButtonType.FUNCTION);
         butSqrt = createButton("sqrt", ButtonType.FUNCTION);
         butSquare = createButton("x^2", ButtonType.FUNCTION);
         butInv = createButton("1/x", ButtonType.FUNCTION);
@@ -162,6 +163,8 @@ public class SwingView implements View {
         subPanels[4].add(butNegate);
         subPanels[4].add(butNums[0]);
         subPanels[4].add(butDecimal);
+        subPanels[4].add(Box.createHorizontalStrut(15));
+        subPanels[4].add(butReturn);
         mainPanel.add(subPanels[4]);
 
         // --- Extra separation ---
@@ -235,6 +238,7 @@ public class SwingView implements View {
         butDecimal.addActionListener(e -> eventHandler.onDecimalPressed());
         butEqual.addActionListener(e -> eventHandler.onEqualsPressed());
         butCancel.addActionListener(e -> eventHandler.onClearPressed());
+        butReturn.addActionListener(e -> eventHandler.onReturnPressed());
     }
 
     @Override
