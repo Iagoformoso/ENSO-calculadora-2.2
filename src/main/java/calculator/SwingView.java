@@ -60,9 +60,9 @@ public class SwingView implements View {
 
     private EventHandler eventHandler;
 
-    private final Font numberFont = new Font("Segoe UI", Font.BOLD, 18);
-    private final Font functionFont = new Font("Segoe UI", Font.PLAIN, 18);
-    private final Font textFont = new Font("Segoe UI", Font.BOLD, 24);
+    private final Font numberFont = ConfigManager.getFont("ui.font.family", Font.BOLD, 18, "Segoe UI");
+    private final Font functionFont = ConfigManager.getFont("ui.font.family", Font.PLAIN, 18, "Segoe UI");
+    private final Font textFont = ConfigManager.getFont("ui.font.family", Font.BOLD, 24, "Segoe UI");
     private final ImageIcon image;
 
     private final DecimalFormat decimalFormat;
@@ -80,12 +80,14 @@ public class SwingView implements View {
         frame = new JFrame("Calculator");
         image = loadIcon();
 
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
+        mainPanel = new JPanel();
+        mainPanel.setBackground(ConfigManager.getColor("ui.color.panel.bg", "#F0F0F0"));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         subPanels = new JPanel[9];
         for (int i = 0; i < 9; i++) {
             subPanels[i] = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 3));
+            subPanels[i].setBackground(ConfigManager.getColor("ui.color.panel.bg", "#F0F0F0"));
         }
 
         // --- JTextField for display ---
@@ -94,8 +96,9 @@ public class SwingView implements View {
         text.setEditable(false);
         text.setHorizontalAlignment(JTextField.RIGHT);
         text.setColumns(15);
-        text.setBackground(Color.WHITE);
-        text.setOpaque(true); 
+        text.setBackground(ConfigManager.getColor("ui.color.display.bg", "#FFFFFF"));
+        text.setForeground(ConfigManager.getColor("ui.color.display.text", "#000000"));
+        text.setOpaque(true);
         text.setBorder(javax.swing.BorderFactory.createLineBorder(
             UIManager.getColor("Panel.background"), 5));
 
@@ -135,7 +138,12 @@ public class SwingView implements View {
         JButton b = new JButton(label);
         b.setFont(type == ButtonType.NUMBER ? numberFont : functionFont);
         b.setPreferredSize(new java.awt.Dimension(80, 40));
-        b.setBackground(type == ButtonType.NUMBER ? Color.WHITE : new Color(220, 255, 255));
+
+        Color bgColor = (type == ButtonType.NUMBER) 
+            ? ConfigManager.getColor("ui.color.number.bg", "#FFFFFF") 
+            : ConfigManager.getColor("ui.color.function.bg", "#DCFFFF");
+            
+        b.setBackground(bgColor);
         b.setFocusPainted(false);
         b.setBorderPainted(true);
         b.setOpaque(true);
