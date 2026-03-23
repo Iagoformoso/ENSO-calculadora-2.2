@@ -55,4 +55,9 @@ public interface EventHandler {
      * @param number The constant pressed
      */
     void onConstantPressed(double value);
+     /**
+     * Handle the return button pressed
+     * 
+     */
+    void onReturnPressed();
 }

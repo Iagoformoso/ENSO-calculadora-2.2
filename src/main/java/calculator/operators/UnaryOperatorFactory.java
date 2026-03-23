@@ -25,12 +25,18 @@ public class UnaryOperatorFactory {
             case COS -> new CosOperator();
             case SIN -> new SinOperator();
             case TAN -> new TanOperator();
+            case ACOS -> new AcosOperator();
+            case ASIN -> new AsinOperator();
+            case ATAN -> new AtanOperator();
             case LOG -> new LogOperator();
             case LN -> new LnOperator();
             case PERCENT -> new PercentOperator();
             case ABS -> new AbsOperator();
             case BIN -> new BinOperator();
             case NEGATE -> new NegateOperator();
+            case MS -> new MSOperator();
+            case MR -> new MROperator();
+            case MC -> new MCOperator();
             default -> throw new IllegalArgumentException("Unknown operator mode: " + mode);
         };
     }

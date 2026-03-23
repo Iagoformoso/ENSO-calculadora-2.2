@@ -44,6 +44,14 @@ import static calculator.domain.UnaryOperatorModes.SIN;
 import static calculator.domain.UnaryOperatorModes.SQRT;
 import static calculator.domain.UnaryOperatorModes.SQUARE;
 import static calculator.domain.UnaryOperatorModes.TAN;
+import static calculator.domain.UnaryOperatorModes.ACOS;
+import static calculator.domain.UnaryOperatorModes.ASIN;
+import static calculator.domain.UnaryOperatorModes.ATAN;
+
+// Añadido: imports para MS, MR y MC de memoria
+import static calculator.domain.UnaryOperatorModes.MS;
+import static calculator.domain.UnaryOperatorModes.MR;
+import static calculator.domain.UnaryOperatorModes.MC;
 
 public class SwingView implements View {
 
@@ -53,16 +61,19 @@ public class SwingView implements View {
     private final JTextField text;
 
     private final JButton[] butNums;
+    // Añadido: butMS, butMR, butMC para memoria
     private final JButton butAdd, butMinus, butMultiply, butDivide,
             butEqual, butCancel, butSqrt, butSquare, butInv, butCos,
             butSin, butTan, butPower, butLog, butPercent, butAbs, butBin,
-            butln, butNegate, butDecimal, butPi, butE;
+            butln, butNegate, butDecimal, butPi, butE,
+            butSin, butTan, butAcos, butAsin, butAtan, butPower, butLog, butPercent, butAbs, butBin,
+            butln, butNegate, butDecimal, butReturn, butMS, butMR, butMC;
 
     private EventHandler eventHandler;
 
-    private final Font numberFont = new Font("Segoe UI", Font.BOLD, 18);
-    private final Font functionFont = new Font("Segoe UI", Font.PLAIN, 18);
-    private final Font textFont = new Font("Segoe UI", Font.BOLD, 24);
+    private final Font numberFont = ConfigManager.getFont("ui.font.family", Font.BOLD, 18, "Segoe UI");
+    private final Font functionFont = ConfigManager.getFont("ui.font.family", Font.PLAIN, 18, "Segoe UI");
+    private final Font textFont = ConfigManager.getFont("ui.font.family", Font.BOLD, 24, "Segoe UI");
     private final ImageIcon image;
 
     private final DecimalFormat decimalFormat;
@@ -82,12 +93,16 @@ public class SwingView implements View {
         frame = new JFrame("Calculator");
         image = loadIcon();
 
+
         mainPanel = new JPanel();
+        mainPanel.setBackground(ConfigManager.getColor("ui.color.panel.bg", "#F0F0F0"));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        subPanels = new JPanel[9];
-        for (int i = 0; i < 9; i++) {
+        // Modificado: tamaño 11 para incluir la nueva fila para botones de memoria
+        subPanels = new JPanel[11];
+        for (int i = 0; i < 11; i++) {
             subPanels[i] = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 3));
+            subPanels[i].setBackground(ConfigManager.getColor("ui.color.panel.bg", "#F0F0F0"));
         }
 
         // --- JTextField for display ---
@@ -96,7 +111,9 @@ public class SwingView implements View {
         text.setEditable(false);
         text.setHorizontalAlignment(JTextField.RIGHT);
         text.setColumns(15);
-        text.setBackground(Color.WHITE);
+
+        text.setBackground(ConfigManager.getColor("ui.color.display.bg", "#FFFFFF"));
+        text.setForeground(ConfigManager.getColor("ui.color.display.text", "#000000"));
         text.setOpaque(true);
         text.setBorder(javax.swing.BorderFactory.createLineBorder(
                 UIManager.getColor("Panel.background"), 5));
@@ -114,12 +131,16 @@ public class SwingView implements View {
         butDivide = createButton("/", ButtonType.FUNCTION);
         butEqual = createButton("=", ButtonType.FUNCTION);
         butCancel = createButton("C", ButtonType.FUNCTION);
+        butReturn = createButton("DEL", ButtonType.FUNCTION);
         butSqrt = createButton("sqrt", ButtonType.FUNCTION);
         butSquare = createButton("x^2", ButtonType.FUNCTION);
         butInv = createButton("1/x", ButtonType.FUNCTION);
         butCos = createButton("cos", ButtonType.FUNCTION);
         butSin = createButton("sin", ButtonType.FUNCTION);
         butTan = createButton("tan", ButtonType.FUNCTION);
+        butAcos = createButton("acos", ButtonType.FUNCTION);
+        butAsin = createButton("asin", ButtonType.FUNCTION);
+        butAtan = createButton("atan", ButtonType.FUNCTION);
         butln = createButton("ln", ButtonType.FUNCTION);
         butPower = createButton("x^y", ButtonType.FUNCTION);
         butLog = createButton("log", ButtonType.FUNCTION);
@@ -130,6 +151,11 @@ public class SwingView implements View {
         butDecimal = createButton(".", ButtonType.NUMBER);
         butPi = createButton("π", ButtonType.NUMBER);
         butE = createButton("e", ButtonType.NUMBER);
+        butDecimal = createButton(",", ButtonType.NUMBER);
+        butMS = createButton("MS", ButtonType.FUNCTION);
+        butMR = createButton("MR", ButtonType.FUNCTION);
+        butMC = createButton("MC", ButtonType.FUNCTION);
+
         setupLayout();
     }
 
@@ -137,7 +163,12 @@ public class SwingView implements View {
         JButton b = new JButton(label);
         b.setFont(type == ButtonType.NUMBER ? numberFont : functionFont);
         b.setPreferredSize(new java.awt.Dimension(80, 40));
-        b.setBackground(type == ButtonType.NUMBER ? Color.WHITE : new Color(220, 255, 255));
+
+        Color bgColor = (type == ButtonType.NUMBER) 
+            ? ConfigManager.getColor("ui.color.number.bg", "#FFFFFF") 
+            : ConfigManager.getColor("ui.color.function.bg", "#DCFFFF");
+            
+        b.setBackground(bgColor);
         b.setFocusPainted(false);
         b.setBorderPainted(true);
         b.setOpaque(true);
@@ -183,6 +214,8 @@ public class SwingView implements View {
         subPanels[4].add(butDecimal);
         subPanels[4].add(butPi);
         subPanels[4].add(butE);
+        subPanels[4].add(Box.createHorizontalStrut(15));
+        subPanels[4].add(butReturn);
         mainPanel.add(subPanels[4]);
 
         // --- Extra separation ---
@@ -207,14 +240,27 @@ public class SwingView implements View {
         mainPanel.add(subPanels[7]);
 
         // --- Row 8 ---
-        subPanels[8].add(butPercent);
-        subPanels[8].add(butAbs);
-        subPanels[8].add(butBin);
+        subPanels[8].add(butAcos);
+        subPanels[8].add(butAsin);
+        subPanels[8].add(butAtan);
         mainPanel.add(subPanels[8]);
+
+        // --- Row 9 ---
+        subPanels[9].add(butPercent);
+        subPanels[9].add(butAbs);
+        subPanels[9].add(butBin);
+        mainPanel.add(subPanels[9]);
+      
+        // --- Row 10 ---
+        subPanels[10].add(butMS);
+        subPanels[10].add(butMR);
+        subPanels[10].add(butMC);
+        subPanels[10].add(Box.createHorizontalStrut(15));
+        mainPanel.add(subPanels[10]);
     }
 
     public void init() {
-        frame.setSize(465, 460);
+        frame.setSize(465, 510);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -246,6 +292,9 @@ public class SwingView implements View {
         butCos.addActionListener(e -> eventHandler.onUnaryOperatorPressed(COS));
         butSin.addActionListener(e -> eventHandler.onUnaryOperatorPressed(SIN));
         butTan.addActionListener(e -> eventHandler.onUnaryOperatorPressed(TAN));
+        butAcos.addActionListener(e -> eventHandler.onUnaryOperatorPressed(ACOS));
+        butAsin.addActionListener(e -> eventHandler.onUnaryOperatorPressed(ASIN));
+        butAtan.addActionListener(e -> eventHandler.onUnaryOperatorPressed(ATAN));
         butLog.addActionListener(e -> eventHandler.onUnaryOperatorPressed(LOG));
         butln.addActionListener(e -> eventHandler.onUnaryOperatorPressed(LN));
         butPercent.addActionListener(e -> eventHandler.onUnaryOperatorPressed(PERCENT));
@@ -261,6 +310,13 @@ public class SwingView implements View {
         // Constants
         butPi.addActionListener(e -> eventHandler.onConstantPressed(Math.PI));
         butE.addActionListener(e -> eventHandler.onConstantPressed(Math.E));
+        butReturn.addActionListener(e -> eventHandler.onReturnPressed());
+
+        // Añadido: Acciones de memoria
+        butMS.addActionListener(e -> eventHandler.onUnaryOperatorPressed(MS));
+        butMR.addActionListener(e -> eventHandler.onUnaryOperatorPressed(MR));
+        butMC.addActionListener(e -> eventHandler.onUnaryOperatorPressed(MC));
+        
     }
 
     @Override
@@ -276,6 +332,7 @@ public class SwingView implements View {
     @Override
     public Double getDisplayValue() {
         String textValue = text.getText().trim();
+        textValue = textValue.replace(',', '.');
 
         if (textValue.isEmpty()) {
             return 0.0;

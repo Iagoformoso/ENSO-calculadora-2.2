@@ -14,5 +14,6 @@ public interface UnaryOperator {
      * @param num The number to operate on
      * @return The result of the operation
      */
+
     Double execute(Double num);
 }
