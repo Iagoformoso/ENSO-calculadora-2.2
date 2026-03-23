@@ -44,6 +44,9 @@ import static calculator.domain.UnaryOperatorModes.SIN;
 import static calculator.domain.UnaryOperatorModes.SQRT;
 import static calculator.domain.UnaryOperatorModes.SQUARE;
 import static calculator.domain.UnaryOperatorModes.TAN;
+import static calculator.domain.UnaryOperatorModes.ACOS;
+import static calculator.domain.UnaryOperatorModes.ASIN;
+import static calculator.domain.UnaryOperatorModes.ATAN;
 
 // Añadido: imports para MS, MR y MC de memoria
 import static calculator.domain.UnaryOperatorModes.MS;
@@ -60,8 +63,8 @@ public class SwingView implements View {
     private final JButton[] butNums;
     // Añadido: butMS, butMR, butMC para memoria
     private final JButton butAdd, butMinus, butMultiply, butDivide,
-            butEqual, butCancel, butSqrt, butSquare, butInv, butCos, 
-            butSin, butTan, butPower, butLog, butPercent, butAbs, butBin, 
+            butEqual, butCancel, butSqrt, butSquare, butInv, butCos,
+            butSin, butTan, butAcos, butAsin, butAtan, butPower, butLog, butPercent, butAbs, butBin,
             butln, butNegate, butDecimal, butReturn, butMS, butMR, butMC;
 
     private EventHandler eventHandler;
@@ -74,7 +77,9 @@ public class SwingView implements View {
     private final DecimalFormat decimalFormat;
     private boolean startNewInput = true;
 
-    public enum ButtonType { NUMBER, FUNCTION }
+    public enum ButtonType {
+        NUMBER, FUNCTION
+    }
 
     public SwingView() throws IOException {
         Locale.setDefault(Locale.US);
@@ -91,9 +96,9 @@ public class SwingView implements View {
         mainPanel.setBackground(ConfigManager.getColor("ui.color.panel.bg", "#F0F0F0"));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        // Modificado: tamaño 10 para incluir la nueva fila para botones de memoria
-        subPanels = new JPanel[10];
-        for (int i = 0; i < 10; i++) {
+        // Modificado: tamaño 11 para incluir la nueva fila para botones de memoria
+        subPanels = new JPanel[11];
+        for (int i = 0; i < 11; i++) {
             subPanels[i] = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 3));
             subPanels[i].setBackground(ConfigManager.getColor("ui.color.panel.bg", "#F0F0F0"));
         }
@@ -104,11 +109,12 @@ public class SwingView implements View {
         text.setEditable(false);
         text.setHorizontalAlignment(JTextField.RIGHT);
         text.setColumns(15);
+
         text.setBackground(ConfigManager.getColor("ui.color.display.bg", "#FFFFFF"));
         text.setForeground(ConfigManager.getColor("ui.color.display.text", "#000000"));
         text.setOpaque(true);
         text.setBorder(javax.swing.BorderFactory.createLineBorder(
-            UIManager.getColor("Panel.background"), 5));
+                UIManager.getColor("Panel.background"), 5));
 
         // Number buttons
         butNums = new JButton[10];
@@ -130,6 +136,9 @@ public class SwingView implements View {
         butCos = createButton("cos", ButtonType.FUNCTION);
         butSin = createButton("sin", ButtonType.FUNCTION);
         butTan = createButton("tan", ButtonType.FUNCTION);
+        butAcos = createButton("acos", ButtonType.FUNCTION);
+        butAsin = createButton("asin", ButtonType.FUNCTION);
+        butAtan = createButton("atan", ButtonType.FUNCTION);
         butln = createButton("ln", ButtonType.FUNCTION);
         butPower = createButton("x^y", ButtonType.FUNCTION);
         butLog = createButton("log", ButtonType.FUNCTION);
@@ -224,24 +233,32 @@ public class SwingView implements View {
         mainPanel.add(subPanels[7]);
 
         // --- Row 8 ---
-        subPanels[8].add(butPercent);
-        subPanels[8].add(butAbs);
-        subPanels[8].add(butBin);
+        subPanels[8].add(butAcos);
+        subPanels[8].add(butAsin);
+        subPanels[8].add(butAtan);
         mainPanel.add(subPanels[8]);
 
-        // --- Row 9 (Memory) ---
-        subPanels[9].add(butMS);
-        subPanels[9].add(butMR);
-        subPanels[9].add(butMC);
+        // --- Row 9 ---
+        subPanels[9].add(butPercent);
+        subPanels[9].add(butAbs);
+        subPanels[9].add(butBin);
         mainPanel.add(subPanels[9]);
+      
+        // --- Row 10 ---
+        subPanels[10].add(butMS);
+        subPanels[10].add(butMR);
+        subPanels[10].add(butMC);
+        subPanels[10].add(Box.createHorizontalStrut(15));
+        mainPanel.add(subPanels[10]);
     }
 
     public void init() {
-        frame.setSize(465, 460);
+        frame.setSize(465, 510);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        if (image != null) frame.setIconImage(image.getImage());
+        if (image != null)
+            frame.setIconImage(image.getImage());
         frame.add(mainPanel);
         frame.setVisible(true);
     }
@@ -268,6 +285,9 @@ public class SwingView implements View {
         butCos.addActionListener(e -> eventHandler.onUnaryOperatorPressed(COS));
         butSin.addActionListener(e -> eventHandler.onUnaryOperatorPressed(SIN));
         butTan.addActionListener(e -> eventHandler.onUnaryOperatorPressed(TAN));
+        butAcos.addActionListener(e -> eventHandler.onUnaryOperatorPressed(ACOS));
+        butAsin.addActionListener(e -> eventHandler.onUnaryOperatorPressed(ASIN));
+        butAtan.addActionListener(e -> eventHandler.onUnaryOperatorPressed(ATAN));
         butLog.addActionListener(e -> eventHandler.onUnaryOperatorPressed(LOG));
         butln.addActionListener(e -> eventHandler.onUnaryOperatorPressed(LN));
         butPercent.addActionListener(e -> eventHandler.onUnaryOperatorPressed(PERCENT));
@@ -354,7 +374,8 @@ public class SwingView implements View {
 
     private ImageIcon loadIcon() throws IOException {
         try (InputStream is = getClass().getResourceAsStream("/icon/icon.png")) {
-            if (is == null) return null;
+            if (is == null)
+                return null;
             BufferedImage bufferedImage = ImageIO.read(is);
             return new ImageIcon(bufferedImage);
         } catch (Exception e) {
