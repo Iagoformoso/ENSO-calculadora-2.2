@@ -87,10 +87,23 @@ public class Controller implements EventHandler {
             Double num = view.getDisplayValue();
             Double result = model.calculateUnary(mode, num);
 
-            displayBuffer = new StringBuilder();
-            view.setDisplay(formatResult(result));
-            displayBuffer.append(result);
+            if(result != null){
+                displayBuffer = new StringBuilder();
+                view.setDisplay(formatResult(result));
+                displayBuffer.append(result);
+            }
             resetingInput = true;
+        }
+        else{
+            if(mode == UnaryOperatorModes.MR || mode == UnaryOperatorModes.MC){
+                Double result = model.calculateUnary(mode, 0.0);
+                if(result != null){
+                    displayBuffer = new StringBuilder();
+                    view.setDisplay(formatResult(result));
+                    displayBuffer.append(result);
+                }
+                resetingInput = true;
+            }
         }
     }
 

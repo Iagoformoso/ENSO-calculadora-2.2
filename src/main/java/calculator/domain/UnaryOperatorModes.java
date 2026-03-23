@@ -8,6 +8,7 @@
 
 package calculator.domain;
 
+// Modificado: añadidos MS, MR y MC para memoria
 public enum UnaryOperatorModes {
     SQUARE,     // Square
     SQRT,       // Square root
@@ -23,6 +24,9 @@ public enum UnaryOperatorModes {
     PERCENT,    // Percentage
     ABS,        // Absolute value
     BIN,        // Conversion from Decimal to Binary
-    NEGATE      // Change of sign
+    NEGATE,      // Change of sign
+    MS,         // Memory Store
+    MR,         // Memory Recall
+    MC          // Memory Clear
 }
 
