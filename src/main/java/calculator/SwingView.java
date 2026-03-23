@@ -45,6 +45,11 @@ import static calculator.domain.UnaryOperatorModes.SQRT;
 import static calculator.domain.UnaryOperatorModes.SQUARE;
 import static calculator.domain.UnaryOperatorModes.TAN;
 
+// Añadido: imports para MS, MR y MC de memoria
+import static calculator.domain.UnaryOperatorModes.MS;
+import static calculator.domain.UnaryOperatorModes.MR;
+import static calculator.domain.UnaryOperatorModes.MC;
+
 public class SwingView implements View {
 
     private final JFrame frame;
@@ -53,10 +58,11 @@ public class SwingView implements View {
     private final JTextField text;
 
     private final JButton[] butNums;
+    // Añadido: butMS, butMR, butMC para memoria
     private final JButton butAdd, butMinus, butMultiply, butDivide,
             butEqual, butCancel, butSqrt, butSquare, butInv, butCos, 
             butSin, butTan, butPower, butLog, butPercent, butAbs, butBin, 
-            butln, butNegate, butDecimal, butReturn;
+            butln, butNegate, butDecimal, butReturn, butMS, butMR, butMC;
 
     private EventHandler eventHandler;
 
@@ -84,8 +90,10 @@ public class SwingView implements View {
         mainPanel = new JPanel();
         mainPanel.setBackground(ConfigManager.getColor("ui.color.panel.bg", "#F0F0F0"));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        subPanels = new JPanel[9];
-        for (int i = 0; i < 9; i++) {
+
+        // Modificado: tamaño 10 para incluir la nueva fila para botones de memoria
+        subPanels = new JPanel[10];
+        for (int i = 0; i < 10; i++) {
             subPanels[i] = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 3));
             subPanels[i].setBackground(ConfigManager.getColor("ui.color.panel.bg", "#F0F0F0"));
         }
@@ -130,6 +138,9 @@ public class SwingView implements View {
         butBin = createButton("bin", ButtonType.FUNCTION);
         butNegate = createButton("+/-", ButtonType.NUMBER);
         butDecimal = createButton(",", ButtonType.NUMBER);
+        butMS = createButton("MS", ButtonType.FUNCTION);
+        butMR = createButton("MR", ButtonType.FUNCTION);
+        butMC = createButton("MC", ButtonType.FUNCTION);
 
         setupLayout();
     }
@@ -217,6 +228,12 @@ public class SwingView implements View {
         subPanels[8].add(butAbs);
         subPanels[8].add(butBin);
         mainPanel.add(subPanels[8]);
+
+        // --- Row 9 (Memory) ---
+        subPanels[9].add(butMS);
+        subPanels[9].add(butMR);
+        subPanels[9].add(butMC);
+        mainPanel.add(subPanels[9]);
     }
 
     public void init() {
@@ -263,6 +280,12 @@ public class SwingView implements View {
         butEqual.addActionListener(e -> eventHandler.onEqualsPressed());
         butCancel.addActionListener(e -> eventHandler.onClearPressed());
         butReturn.addActionListener(e -> eventHandler.onReturnPressed());
+
+        // Añadido: Acciones de memoria
+        butMS.addActionListener(e -> eventHandler.onUnaryOperatorPressed(MS));
+        butMR.addActionListener(e -> eventHandler.onUnaryOperatorPressed(MR));
+        butMC.addActionListener(e -> eventHandler.onUnaryOperatorPressed(MC));
+        
     }
 
     @Override
